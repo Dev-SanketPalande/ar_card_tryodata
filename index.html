@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>TryoData AR Card (Marker)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/aframe/build/aframe-ar.min.js"></script>
+  <style>
+    body { margin:0; overflow:hidden; font-family: Inter, Arial, sans-serif; background: #000; }
+    #overlay {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 20px;
+      display:flex;
+      gap:10px;
+      z-index: 9999;
+      pointer-events: auto;
+    }
+    .btn { 
+      background: linear-gradient(90deg,#004aad,#007bff);
+      color:white; padding:10px 14px; border-radius:8px; border:none; font-weight:600;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+      font-size:14px;
+    }
+    #hint {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color:#fff;
+      background: rgba(0,0,0,0.35);
+      padding:8px 12px;
+      border-radius:10px;
+      z-index:9999;
+      font-size:13px;
+    }
+    a { color:inherit; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <div id="hint">Point camera at the printed marker to view the AR card. Tap the screen to enable audio.</div>
+
+  <!-- Overlay buttons -->
+  <div id="overlay">
+    <button class="btn" onclick="window.open('https://api.whatsapp.com/send?phone=919920145556&text=Hi%20Sanket!%20Just%20reached%20here%20through%20your%20AR%20card.%20This%20is%20exciting.%20I%20will%20come%20back%20in%20case%20I%20want%20to%20work%20with%20you.','_blank')">💬 WhatsApp</button>
+    <button class="btn" onclick="window.open('https://linkedin.com/in/sanketpalande/','_blank')">💼 LinkedIn</button>
+    <button class="btn" onclick="window.open('sanket_palande.vcf','_blank')">📇 Save Contact</button>
+  </div>
+
+  <!-- A-Frame + AR.js marker-based scene -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-assets>
+      <video id="introVideo" src="intro.mp4" preload="auto" crossorigin="anonymous"></video>
+      <img id="logo" src="logo.png" crossorigin="anonymous" />
+    </a-assets>
+
+    <!-- Use 'hiro' marker for testing; replace with custom.patt later -->
+    <a-marker preset="pattern-logo.patt">
+      <!-- Video panel anchored to marker.
+           rotation and position make it face the camera correctly. -->
+      <a-entity position="0 0 0">
+        <a-video src="#introVideo" width="1.6" height="0.9" position="0 0.45 0" rotation="-90 0 0"></a-video>
+        <a-image src="#logo" position="0 1.25 0" width="0.6" height="0.6"></a-image>
+        <a-entity position="0 -0.35 0">
+          <a-text value="Scan for AR — TryoData" align="center" color="#ffffff" width="2"></a-text>
+        </a-entity>
+      </a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    const video = document.getElementById('introVideo');
+    // try autoplay muted first (many phones block non-muted autoplay)
+    video.muted = true;
+    video.play().catch(()=> {
+      // If autoplay fails, request user interaction
+      document.getElementById('hint').innerText = "Tap the screen to play video/audio.";
+      function start() {
+        video.muted = false;
+        video.play().catch(()=>{});
+        window.removeEventListener('click', start);
+        document.getElementById('hint').style.display = 'none';
+      }
+      window.addEventListener('click', start);
+    });
+  </script>
+</body>
+</html>
